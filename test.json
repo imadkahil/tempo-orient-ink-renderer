@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "mockupId": "mug_white_front",
+  "canvas": {
+    "width": 2000,
+    "height": 1500
+  },
+  "mockup": {
+    "baseImage": "https://i.imgur.com/FkpScM4.jpeg",
+    "overlayImage": "",
+    "maskImage": "",
+    "width": 2000,
+    "height": 1500
+  },
+  "printRegionOnMug": {
+    "x": 400.0000000000001,
+    "y": 300,
+    "width": 1200,
+    "height": 900.0000000000001
+  },
+  "designAreaMargins": {
+    "left": 0.2,
+    "top": 0.2,
+    "right": 0.2,
+    "bottom": 0.2
+  },
+  "constraints": {
+    "allowOutsideDesignArea": false,
+    "minScale": 0.1,
+    "maxScale": 4,
+    "allowRotation": true,
+    "allowFlip": true,
+    "dpi": 300
+  },
+  "layers": [
+    {
+      "id": "683c9fcb-667f-41a9-9739-509279ae7242",
+      "type": "image",
+      "src": "https://i.imgur.com/7gc4B3C.jpeg",
+      "name": "Template 2 (1800×1500)",
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 397.05882352941177,
+      "scaleX": 1,
+      "scaleY": 1,
+      "rotation": 0,
+      "originalWidth": 2550,
+      "originalHeight": 1125,
+      "opacity": 0.34,
+      "visible": true,
+      "locked": false,
+      "zIndex": 0
+    },
+    {
+      "id": "8826229a-49cd-484b-8faf-d06b288549bb",
+      "type": "image",
+      "src": "https://dummyimage.com/1000x800/f700f7/4f5af5",
+      "name": "Template 3 (1000×800)",
+      "x": 740.0055058653038,
+      "y": 542.0044046922432,
+      "width": 519.9889882693924,
+      "height": 415.9911906155137,
+      "scaleX": 1,
+      "scaleY": 1,
+      "rotation": 0,
+      "originalWidth": 1000,
+      "originalHeight": 800,
+      "opacity": 0.51,
+      "visible": true,
+      "locked": false,
+      "zIndex": 1
+    }
+  ]
+}

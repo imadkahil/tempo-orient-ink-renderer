@@ -47,7 +47,35 @@ export interface DesignDocument {
   layers: Layer[];
 }
 
-export type Layer = ImageLayer | DrawLayer;
+export type Layer = ImageLayer | DrawLayer | TextLayer;
+
+export type TextAlign = "left" | "center" | "right";
+
+/**
+ * Wrapping mode. The editor freezes wrapping at export: it serializes the lines
+ * it laid out as explicit "\n" breaks in `text` and sets `wrap: "none"` here, so
+ * we render the identical line structure rather than re-wrapping with
+ * node-canvas's `measureText` (which differs from the browser's and caused
+ * line-break / overflow drift). Defaults to `"word"` for older scenes.
+ */
+export type TextWrap = "word" | "none";
+
+export interface TextLayer extends BaseLayer {
+  type: "text";
+  text: string;
+  width: number;
+  wrap?: TextWrap;
+  // Stored on the export but not consumed by Konva.Text (which measures its
+  // own height); kept for round-trip parity with the frontend.
+  height?: number;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  italic: boolean;
+  align: TextAlign;
+  lineHeight: number;
+  fill: string;
+}
 
 interface BaseLayer {
   id: string;

@@ -2,21 +2,21 @@
   "version": "1.0",
   "mockupId": "mug_white_front",
   "canvas": {
-    "width": 2000,
-    "height": 1500
+    "width": 1125,
+    "height": 1125
   },
   "mockup": {
     "baseImage": "https://i.imgur.com/FkpScM4.jpeg",
     "overlayImage": "",
     "maskImage": "",
-    "width": 2000,
-    "height": 1500
+    "width": 1125,
+    "height": 1125
   },
   "printRegionOnMug": {
-    "x": 400.0000000000001,
-    "y": 300,
-    "width": 1200,
-    "height": 900.0000000000001
+    "x": 225,
+    "y": 225,
+    "width": 675.0000000000001,
+    "height": 675.0000000000001
   },
   "designAreaMargins": {
     "left": 0.2,
@@ -34,39 +34,39 @@
   },
   "layers": [
     {
-      "id": "683c9fcb-667f-41a9-9739-509279ae7242",
-      "type": "image",
-      "src": "https://i.imgur.com/7gc4B3C.jpeg",
-      "name": "Template 2 (1800×1500)",
-      "x": 0,
-      "y": 0,
-      "width": 900,
-      "height": 397.05882352941177,
-      "scaleX": 1,
-      "scaleY": 1,
-      "rotation": 0,
-      "originalWidth": 2550,
-      "originalHeight": 1125,
-      "opacity": 0.34,
-      "visible": true,
-      "locked": false,
-      "zIndex": 0
-    },
-    {
-      "id": "8826229a-49cd-484b-8faf-d06b288549bb",
+      "id": "c721be1d-b68f-40f7-89ab-e80cfb583673",
       "type": "image",
       "src": "https://dummyimage.com/1000x800/f700f7/4f5af5",
       "name": "Template 3 (1000×800)",
-      "x": 740.0055058653038,
-      "y": 542.0044046922432,
-      "width": 519.9889882693924,
-      "height": 415.9911906155137,
+      "x": -147.0588235294117,
+      "y": -3.063725490196086,
+      "width": 675,
+      "height": 540,
       "scaleX": 1,
       "scaleY": 1,
       "rotation": 0,
       "originalWidth": 1000,
       "originalHeight": 800,
-      "opacity": 0.51,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "zIndex": 0
+    },
+    {
+      "id": "c19f9d26-22a6-42fb-b76a-cda69269e1ed",
+      "type": "image",
+      "src": "https://i.imgur.com/7gc4B3C.jpeg",
+      "name": "Template 2 (1800×1500)",
+      "x": -1.4210854715202e-13,
+      "y": 827.2058823529411,
+      "width": 675,
+      "height": 297.79411764705884,
+      "scaleX": 1,
+      "scaleY": 1,
+      "rotation": 0,
+      "originalWidth": 2550,
+      "originalHeight": 1125,
+      "opacity": 1,
       "visible": true,
       "locked": false,
       "zIndex": 1

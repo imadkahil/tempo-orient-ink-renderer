@@ -5,10 +5,21 @@
 // here and on the frontend, transforms/crop/curve-smoothing match by
 // construction instead of being re-implemented by hand.
 
-import { loadImage } from "canvas";
+// Font registration MUST happen before any canvas is created — node-canvas
+// silently ignores registerFont calls after the first Canvas exists. This
+// side-effect import has to be first so the catalog is registered before
+// `canvas` or `konva` get a chance to instantiate anything.
+import "./fonts";
+
+import { createCanvas, loadImage } from "canvas";
 import Konva from "konva";
 
-import { DesignDocument, DrawLayer, ImageLayer } from "./design-document";
+import {
+  DesignDocument,
+  DrawLayer,
+  ImageLayer,
+  TextLayer,
+} from "./design-document";
 
 // Make node-canvas downsample with its highest-quality resampler. Shrinking a
 // large source into a small box in one pass aliases under the default 'good';
@@ -36,6 +47,17 @@ export interface RenderOptions {
   // Multiplies output resolution. canvas.width/height already encodes the
   // print size at the document's DPI, so 1 produces the print-ready file.
   pixelRatio?: number;
+  /**
+   * Internal supersampling factor. We render the stage at
+   * `supersample × pixelRatio`, then high-quality downsample back to
+   * `canvas × pixelRatio` for the output. The PNG dimensions are unchanged;
+   * what fills them is built from more sub-pixel samples, so glyph edges and
+   * image edges look as crisp as a HiDPI browser canvas would. Trade-off:
+   * memory + CPU scale ~supersample². Default 2 is a sweet spot — visibly
+   * sharper without a measurable performance cost on typical scenes. Set 1
+   * to disable.
+   */
+  supersample?: number;
   // Toggle ONLY if the frontend positions nodes by their CENTER (i.e. it sets
   // offsetX/offsetY = width/2, height/2 so rotation pivots around the middle).
   // Konva's default — and this renderer's default — is top-left origin, so the
@@ -98,19 +120,51 @@ export async function renderDesign(
       await addImageLayer(layer, l, opts);
     } else if (l.type === "draw") {
       addDrawLayer(layer, l);
+    } else if (l.type === "text") {
+      addTextLayer(layer, l);
     }
   }
 
   layer.draw();
 
-  // Export the full canvas (1125×1125 here). Artwork outside the print area was
-  // already masked out by the layer clip above; on the frontend that overflow
-  // is merely dimmed as a visual cue — this is the real clip.
-  // In Node, Konva's canvas is a node-canvas instance exposing toBuffer().
-  const nodeCanvas = stage.toCanvas({ pixelRatio }) as unknown as {
+  // SUPERSAMPLE: render the stage at supersample × pixelRatio, then high-quality
+  // downsample to the declared output size. This buys browser-HiDPI-equivalent
+  // anti-aliasing on the print file without inflating its declared dimensions.
+  const supersample = Math.max(1, opts.supersample ?? 2);
+  const supersampled = stage.toCanvas({
+    pixelRatio: pixelRatio * supersample,
+  }) as unknown as {
+    width: number;
+    height: number;
     toBuffer: (mime: string) => Buffer;
   };
-  return nodeCanvas.toBuffer("image/png");
+
+  if (supersample === 1) {
+    return supersampled.toBuffer("image/png");
+  }
+
+  const outWidth = Math.round(doc.canvas.width * pixelRatio);
+  const outHeight = Math.round(doc.canvas.height * pixelRatio);
+  const output = createCanvas(outWidth, outHeight);
+  // node-canvas exposes its scaler quality through `quality`/`patternQuality`
+  // (not the browser's `imageSmoothingQuality`). "best" = Lanczos-class; the
+  // default "good" produces visibly softer text after the downscale. We also
+  // keep imageSmoothingEnabled on for the same reason.
+  const octx = output.getContext("2d") as unknown as CanvasRenderingContext2D & {
+    quality?: string;
+    patternQuality?: string;
+  };
+  octx.imageSmoothingEnabled = true;
+  octx.quality = "best";
+  octx.patternQuality = "best";
+  octx.drawImage(
+    supersampled as unknown as Parameters<typeof octx.drawImage>[0],
+    0,
+    0,
+    outWidth,
+    outHeight,
+  );
+  return output.toBuffer("image/png");
 }
 
 /**
@@ -275,6 +329,45 @@ async function addImageLayer(
     node.offsetY(node.height() / 2);
   }
 
+  layer.add(node);
+}
+
+/**
+ * Konva.Text in Node uses node-canvas's font rendering. The frontend's web
+ * fonts (DM Sans, Poppins) are registered from the shared catalog in ./fonts
+ * (imported first in this file) so the glyphs match the editor.
+ *
+ * Wrapping is the subtle part: node-canvas's `measureText` differs from the
+ * browser's, so letting Konva auto-wrap here would pick different line breaks
+ * than the editor showed — taller blocks, overflow, cropping. The frontend
+ * therefore FREEZES its wrapping at export (lines as explicit "\n", `wrap:
+ * "none"`). We honor that here so line structure is identical; only sub-pixel
+ * per-line centering and anti-aliasing can differ. `wrap` defaults to "word"
+ * for older scenes that predate the freeze.
+ */
+function addTextLayer(layer: Konva.Layer, l: TextLayer): void {
+  // Konva packs italic/bold into one CSS-ish fontStyle string ("italic bold").
+  const fontStyle =
+    [l.italic ? "italic" : "", (l.fontWeight ?? 400) >= 600 ? "bold" : ""]
+      .filter(Boolean)
+      .join(" ") || "normal";
+  const node = new Konva.Text({
+    text: l.text,
+    x: l.x ?? 0,
+    y: l.y ?? 0,
+    width: l.width,
+    fontFamily: l.fontFamily,
+    fontSize: l.fontSize,
+    fontStyle,
+    align: l.align,
+    lineHeight: l.lineHeight,
+    fill: l.fill,
+    wrap: l.wrap ?? "word",
+    scaleX: l.scaleX ?? 1,
+    scaleY: l.scaleY ?? 1,
+    rotation: l.rotation ?? 0,
+    opacity: l.opacity ?? 1,
+  });
   layer.add(node);
 }
 

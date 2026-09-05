@@ -60,11 +60,26 @@ export type TextAlign = "left" | "center" | "right";
  */
 export type TextWrap = "word" | "none";
 
+/**
+ * Per-line frozen geometry from the editor (geometry freeze). `dx`/`dy` are the
+ * line's top-left offset from the layer's (x, y) origin, in ART space, before
+ * rotation/scale. When `TextLayer.lines` is present we render each line
+ * left-aligned at its exact offset so positioning matches the editor's (browser)
+ * layout exactly — no node-canvas re-centering. MUST stay in sync with the
+ * frontend's FrozenTextLine.
+ */
+export interface FrozenTextLine {
+  text: string;
+  dx: number;
+  dy: number;
+}
+
 export interface TextLayer extends BaseLayer {
   type: "text";
   text: string;
   width: number;
   wrap?: TextWrap;
+  lines?: FrozenTextLine[];
   // Stored on the export but not consumed by Konva.Text (which measures its
   // own height); kept for round-trip parity with the frontend.
   height?: number;

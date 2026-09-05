@@ -351,6 +351,41 @@ function addTextLayer(layer: Konva.Layer, l: TextLayer): void {
     [l.italic ? "italic" : "", (l.fontWeight ?? 400) >= 600 ? "bold" : ""]
       .filter(Boolean)
       .join(" ") || "normal";
+
+  // Geometry freeze: when the editor sent per-line positions, render each line
+  // left-aligned at its exact (x + dx, y + dy). A Group carries the layer's
+  // transform/opacity so rotation/scale pivot around (x, y) just like a single
+  // node would. This bypasses node-canvas's own centering entirely, so line
+  // positions match the editor's (browser) layout to the pixel.
+  if (l.lines && l.lines.length > 0) {
+    const group = new Konva.Group({
+      x: l.x ?? 0,
+      y: l.y ?? 0,
+      scaleX: l.scaleX ?? 1,
+      scaleY: l.scaleY ?? 1,
+      rotation: l.rotation ?? 0,
+      opacity: l.opacity ?? 1,
+    });
+    for (const line of l.lines) {
+      group.add(
+        new Konva.Text({
+          text: line.text,
+          x: line.dx,
+          y: line.dy,
+          fontFamily: l.fontFamily,
+          fontSize: l.fontSize,
+          fontStyle,
+          align: "left",
+          lineHeight: l.lineHeight,
+          fill: l.fill,
+          wrap: "none",
+        }),
+      );
+    }
+    layer.add(group);
+    return;
+  }
+
   const node = new Konva.Text({
     text: l.text,
     x: l.x ?? 0,

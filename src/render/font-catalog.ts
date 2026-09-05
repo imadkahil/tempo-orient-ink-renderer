@@ -14,6 +14,7 @@ export interface FontFace {
 
 export const FONT_CATALOG: readonly FontFace[] = [
   { family: "DM Sans", weight: 400, style: "normal", file: "Dm-sans.ttf" },
+  { family: "DM Sans", weight: 700, style: "normal", file: "DMSans-Bold.ttf" },
   { family: "Poppins", weight: 400, style: "normal", file: "Poppins-Regular.ttf" },
   { family: "Poppins", weight: 600, style: "normal", file: "Poppins-SemiBold.ttf" },
 ] as const;
